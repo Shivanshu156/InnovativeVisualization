@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <svg id="circles-container" width="40" height="40"></svg>
+
+    <script>
+        function generateCircles(n, containerWidth, containerHeight) {
+            const circles = [];
+
+            // Calculate the maximum radius that fits the specified width and height
+            const maxRadius = Math.min(containerWidth / (Math.floor(n) + 1), containerHeight / 2);
+
+            // Calculate the vertical spacing between circles
+            const verticalSpacing = 2 * maxRadius;
+
+            let totalCircles = Math.floor(n);
+            let rowCount = 0;
+            // If there's a fractional part, add a pie slice
+            const fraction = n % 1;
+            if (fraction > 0) {
+                const pieRadius = maxRadius;
+                const pieX = 0; // Adjust as needed
+                const pieY = (rowCount - 1) * verticalSpacing + verticalSpacing / 2;
+
+                const arcGenerator = d3.arc()
+                    .innerRadius(0)
+                    .outerRadius(pieRadius)
+                    .startAngle( Math.PI/2)
+                    .endAngle(fraction * 2 * Math.PI + Math.PI/2);
+
+                circles.push({
+                    id: "pie",
+                    cx: pieX,
+                    cy: pieY,
+                    r: pieRadius,
+                    color: getRandomColor(),
+                    arcPath: arcGenerator()
+                });
+                rowCount++;
+            }
+
+
+            while (totalCircles > 0) {
+                const circlesInRow = Math.min(totalCircles, rowCount);
+                const horizontalSpacing = (circlesInRow - 1) * 2 * maxRadius;
+
+                for (let col = 0; col < circlesInRow; col++) {
+                    const x = col * (2 * maxRadius) - horizontalSpacing / 2;
+                    const y = (rowCount - 1) * verticalSpacing + verticalSpacing / 2;
+
+                    circles.push({
+                        id: circles.length + 1,
+                        cx: x,
+                        cy: y,
+                        r: maxRadius,
+                        color: getRandomColor() // You can implement a function to generate random colors
+                    });
+                }
+
+                totalCircles -= circlesInRow;
+                rowCount++;
+            }
+
+
+
+            return circles;
+        }
+
+        // Helper function to generate a random color
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        // Function to create SVG circles and pie slices based on the generated data
+        function createElements(data) {
+            const svg = d3.select("#circles-container");
+
+            // Create pie slice
+            const pieData = data.find(d => d.id === "pie");
+            if (pieData) {
+                svg.append("path")
+                    .attr("class", "pie-slice")
+                    .attr("transform", `translate(${pieData.cx},${pieData.cy})`)
+                    .attr("d", pieData.arcPath)
+                    .attr("fill", pieData.color)
+                    .on("mouseover", handleMouseover)
+                    .on("mouseout", handleMouseout);
+            }
+
+
+            // Create circles
+            svg.selectAll(".circle")
+                .data(data.filter(d => d.id !== "pie"))
+                .enter().append("circle")
+                .attr("class", "circle")
+                .attr("cx", d => d.cx)
+                .attr("cy", d => d.cy)
+                .attr("r", d => d.r)
+                .attr("fill", d => d.color)
+                .on("mouseover", handleMouseover)
+                .on("mouseout", handleMouseout);
+
+
+
+            // Dynamically adjust viewBox to fit all elements
+            const bbox = svg.node().getBBox();
+            const padding = 20;
+            svg.attr("viewBox", `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + 2 * padding} ${bbox.height + 2 * padding}`);
+        }
+
+        // Event handler for mouseover
+        function handleMouseover() {
+            d3.select(this).attr("r", d => d.r * 1.2);
+        }
+
+        // Event handler for mouseout
+        function handleMouseout() {
+            d3.select(this).attr("r", d => d.r);
+        }
+
+        // Example: Generate elements
+        const elementsArray = generateCircles(6.2, 500, 500); // Specify the fixed width and height
+        createElements(elementsArray);
+    </script>
+</body>
+</html>
