@@ -14,18 +14,34 @@
   }
 
 .planet-chart-container {
-  background-color: black;
+  /* background-color: black; */
   width: 600px;
   height: 500px;
 }
 
-.seesaw-container {
-  background-color: white;
+.right-container {
+  /* background-color: black; */
   flex-direction: column;
   width: 400px;
-height:400px;
+height:700px;
+
 }
 
+.seesaw-container {
+    /* background-color: black; */
+    flex-direction: row;
+    width: 400px;
+  height: 300px;
+
+  }
+
+  .orbit-container {
+    /* background-color: blue; */
+    flex-direction: row;
+    width: 400px;
+  height: 300px;
+
+  }
 .container{
     background-color: black;
 }

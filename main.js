@@ -7,8 +7,13 @@ let jupiter_mass = 1898.13
 let earth_radius = 3958.8
 let jupiter_radius = 43441
 let wrt = 'earth'
+let wrt_color = 'skyblue'
 let radiusScale
-let seesaw
+// let seesaw
+let seesaw_height = 300;
+let seesaw_width = 400;
+let margin = { top: 0, right: 40, bottom: 40, left: 20 };
+let seesaw = d3.select(".seesaw-container").append('svg').attr('height', seesaw_height).attr('width',seesaw_width ).attr('class','seesaw');
 
 Promise.all([d3.csv('data/cleaned_5250.csv', (d) => { return d })])
   .then(function (data) {
@@ -35,7 +40,7 @@ Promise.all([d3.csv('data/cleaned_5250.csv', (d) => { return d })])
     $(document).ready(function () {
  
                 drawSolarChart()
-
+                drawSeesaw()
     });
   });
 
@@ -43,18 +48,14 @@ Promise.all([d3.csv('data/cleaned_5250.csv', (d) => { return d })])
 let dropRange = 200
 
 
-function updateCircles(n, color) {
-    console.log('ionside update circles')
-    d3.selectAll('.seesaw').remove()
-    // seesaw.selectAll('g').remove()
-    seesaw = d3.select(".seesaw-container").append('svg').attr('height', 400).attr('width',400 ).attr('class','seesaw');
+function drawSeesaw(){
+    
     const group = seesaw.append("g")
     .attr("transform", `translate(0,${dropRange})`);
 
-    // Append a path element for the triangle
     group.append("path")
         .attr("id", "triangle")
-        .attr("d", "M 200 20 L 180 100 L 220 100 Z")
+        .attr("d", "M 200 20 L 180 60 L 220 60 Z")
         .attr("fill", "lightblue");
 
     // Append a line element for the horizontal line
@@ -67,24 +68,57 @@ function updateCircles(n, color) {
         .attr("stroke", "white")
         .attr("stroke-width", 4);
 
-    g1 = seesaw.append("g").attr("class", "fig-1").attr("transform", "translate(0, -100)");
-    const elementsArray = generateCircles(n, g2_width, g2_height, color); 
-    g2  = createElements(elementsArray).attr("class", "fig-2").attr("transform", `translate(${200-g2_width}, -100)`);
-    g2_height = g2.node().getBoundingClientRect().height
-    g2_width = g2.node().getBoundingClientRect().width
+    seesaw.append('text')
+        .attr('class', 'seesaw-label')
+        .attr('x', seesaw_width / 2 - margin.right )
+        .attr('y', seesaw_height )
+        .text("Mass Scale")
+        .attr("font-size", "20px")
+        .style("stroke", "white");
 
-    g1.append("circle")
-        .attr("cx", 100)
-        .attr("cy", -20)
-        .attr("r", 20)
-        .attr("fill","blue" );
+    seesaw.append('g').attr('class', 'fig-1')
+    seesaw.append('g').attr('class', 'fig-2')
+    seesaw.append('text').attr('class', 'seesaw-info')
 
 }
 
-function balanceSeesaw() {
+
+function updateCircles(n, name, color) {
+    console.log('ionside update circles')
+    if (wrt==='earth'){
+        wrt_color = 'skyblue'
+    }    
+    else{
+        wrt_color='orange'
+    }
+    // d3.selectAll('.seesaw').remove()
+    d3.selectAll('.fig-1').transition().duration(100).attr("transform", `translate(0, -100)`);
+    d3.selectAll('.fig-2').transition().duration(100).attr("transform", `translate(${300-g2_width}, -100)`)
+    d3.selectAll('.seesaw-info').transition().duration(100).style('opacity', 0)
+    .on("end", function(){
+
+        seesaw = d3.select(".seesaw");
+        g1 = seesaw.append("g").attr("class", "fig-1").attr("transform", "translate(0, -100)");
+        const elementsArray = generateCircles(n, g2_width, g2_height, wrt_color); 
+        g2  = createElements(elementsArray).attr("class", "fig-2").attr("transform", `translate(${200-g2_width}, -100)`);
+        g2_height = g2.node().getBoundingClientRect().height
+        g2_width = g2.node().getBoundingClientRect().width
+    
+        g1.append("circle")
+            .attr("cx", 100)
+            .attr("cy", -20)
+            .attr("r", 20)
+            .attr("fill",color );
+        balanceSeesaw(n, name)
+
+ 
+    });
+
+}
+
+function balanceSeesaw(n, name) {
 
     imbalance = 30
-    
     const angleInRadians = imbalance * (Math.PI / 180);
     const end1_dy =  100* Math.sin(angleInRadians)
     const end1_dx = 100 - 100* Math.cos(angleInRadians)
@@ -123,6 +157,18 @@ function balanceSeesaw() {
                 .transition()
                 .duration(500)
                 .attr("transform", `translate(${300-g2_width/2}, ${dropRange-g2_height+5})`)
+                .on("end", function(){
+
+                    seesaw = d3.select('.seesaw')
+                    seesaw.append('text')
+                    .attr("class", "seesaw-info")
+                    .attr("transform", `translate(${seesaw_width/2 }, ${seesaw_height/5})`)
+                    .text(`1 ${name} = ${n} ${wrt.toLocaleLowerCase()}`)
+                    .attr("font-size", "20px")
+                    .attr("text-anchor", "middle") // Align text in the center horizontally
+                    .attr("dominant-baseline", "middle")
+                    .style("stroke", "white");
+                })
 
             })
         })
@@ -273,11 +319,6 @@ function createElements(data) {
     return g
 }
 
-// updateCircles(13.7, 'orange');
-// balanceSeesaw();
-
-
-
 
 
 // Scaled distances for circular lines
@@ -294,28 +335,29 @@ const svg = d3.select(".planet-chart-container")
     .style("border-radius", '50%')
 
 
+
 // Create a group for the night sky background
-const nightSky = svg.append("rect")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight)
-    .attr("fill", "black");
+// const nightSky = svg.append("rect")
+//     .attr("width", svgWidth)
+//     .attr("height", svgHeight)
+//     .attr("fill", "black");
 
 // Create circles for stars
-const starsData = Array.from({ length: 200 }, () => ({
-    x: Math.random() * svgWidth,
-    y: Math.random() * svgHeight,
-    radius: Math.random() * 1.5,
-    color: "white",
-}));
+// const starsData = Array.from({ length: 200 }, () => ({
+//     x: Math.random() * 1300,
+//     y: Math.random() * seesaw_height,
+//     radius: Math.random() * 1.5,
+//     color: "white",
+// }));
 
-const stars = svg.selectAll("circle.star")
-    .data(starsData)
-    .enter().append("circle")
-    .attr("class", "star")
-    .attr("cx", d => d.x)
-    .attr("cy", d => d.y)
-    .attr("r", d => d.radius)
-    .attr("fill", d => d.color);
+// const stars = seesaw.selectAll("circle.star")
+//     .data(starsData)
+//     .enter().append("circle")
+//     .attr("class", "star")
+//     .attr("cx", d => d.x)
+//     .attr("cy", d => d.y)
+//     .attr("r", d => d.radius)
+//     .attr("fill", d => d.color);
 
 
 function drawSolarChart(){
@@ -397,8 +439,8 @@ function drawSolarChart(){
             })
         .on('click', function(event, d){
 
-            updateCircles(d.data.mass_multiplier, colorScale(d.data.planet_type));
-            balanceSeesaw();
+            updateCircles(d.data.mass_multiplier, d.data.name, colorScale(d.data.planet_type));
+            // balanceSeesaw();
         })
 
 
@@ -422,44 +464,10 @@ function drawSolarChart(){
         .attr("x", d=> d*Math.cos(Math.PI/6))
         .attr("y", d => Math.min(svgHeight, svgHeight/2 +  d*Math.sin(Math.PI/6)))
         .text(d => `${d} AU`);
-
-
-    
-
-        function showTooltip(event, d) {
-            d3.select(this)
-        .style('stroke-width', 2)
-        .style('stroke', 'black')
    
-            tooltip.html(`<strong>${d.data.name}</strong><br>Distance: ${d.data.distance} AU`)
-  
-            const xPosition = event.pageX + 10;
-            const yPosition = event.pageY - 30;
-            tooltip.style('left', xPosition + 'px')
-                  .style('top', yPosition + 'px');
-
-      tooltip.style('display', 'inline-block')
-         tooltip.transition()
-                .duration(200)
-                .style("opacity", .9);
-   
-        }
-        
-        function hideTooltip() {
-            tooltip.transition()
-                .duration(500)
-                .style("opacity", 0);
-        }
-
 }
-
-
-
-
-
-
-
-
+        
+ 
 beeswarmForce = function () {
     let x = d => d.x;
     let y = d => d.y;
