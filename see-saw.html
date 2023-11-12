@@ -15,6 +15,7 @@
 
         #seesaw {
             position: relative;
+            display: inline-block;
         }
 
         #triangle {
@@ -39,13 +40,17 @@
     </style>
 </head>
 <body>
-    <svg id="seesaw" width="400" height="200">
-        <g transform="translate(0,80)"> <!-- Adjust the translation values as needed -->
-            <path id="triangle" d="M 200 20 L 100 180 L 300 180 Z"></path>
+    <svg id="svg" width="400" height="200">
+        <g id="seesaw">
+        <g transform="translate(0,80)"> 
+            <path id="triangle" d="M 200 20 L 180 100 L 220 100 Z"></path>
             <line id="line" x1="100" y1="20" x2="300" y2="20"></line>
         </g>
+        </g>
     </svg>
+    <svg id="main_chart"> 
 
+    </svg>
     <script src="main.js">    </script>
 </body>
 </html>

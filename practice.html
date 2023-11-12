@@ -11,16 +11,11 @@
     <script>
         function generateCircles(n, containerWidth, containerHeight) {
             const circles = [];
-
-            // Calculate the maximum radius that fits the specified width and height
             const maxRadius = Math.min(containerWidth / (Math.floor(n) + 1), containerHeight / 2);
-
-            // Calculate the vertical spacing between circles
             const verticalSpacing = 2 * maxRadius;
 
             let totalCircles = Math.floor(n);
             let rowCount = 0;
-            // If there's a fractional part, add a pie slice
             const fraction = n % 1;
             if (fraction > 0) {
                 const pieRadius = maxRadius;
