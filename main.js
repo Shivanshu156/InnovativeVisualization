@@ -1,6 +1,8 @@
 var g1, g2, g2_height = 80, g2_width=80;
 let colorScale;
 let planets_data;
+let planets;
+let data=[];
 let planet_types = []
 let earth_mass = 5.97219
 let jupiter_mass = 1898.13
@@ -9,39 +11,99 @@ let jupiter_radius = 43441
 let wrt = 'earth'
 let wrt_color = 'skyblue'
 let radiusScale
+let year = 1992;
+let distanceMin = 50, distanceMax = 250;
+let d_min, d_max;
+let radiusMin = 5, radiusMax = 20;
 // let seesaw
 let seesaw_height = 300;
 let seesaw_width = 400;
+let planetChartWidth = 600;
+let planetChartHeight = 600;
 let margin = { top: 0, right: 40, bottom: 40, left: 20 };
 let seesaw = d3.select(".seesaw-container").append('svg').attr('height', seesaw_height).attr('width',seesaw_width ).attr('class','seesaw');
 
 Promise.all([d3.csv('data/cleaned_5250.csv', (d) => { return d })])
-  .then(function (data) {
+  .then(function (csv_data) {
     console.log('loaded planets data');
-    planets_data = data[0];
+    planets_data = csv_data[0];
     // console.log(planets_data)
     planet_types = Array.from(new Set(planets_data.map(item => item.planet_type)));
     console.log(planet_types)
     colorScale = d3.scaleOrdinal().domain(planet_types).range(d3.schemeCategory10);
-    planets_data = planets_data.map(d => ({
+    data = planets_data.filter(d=>d.discovery_year<=year).map(d => ({
         ...d, 
-        radius: d.radius_wrt === 'earth' ? earth_radius*d.radius_multiplier : jupiter_radius* d.radius_multiplier, 
-        mass: d.mass_wrt === 'earth' ? earth_mass*d.mass_multiplier : jupiter_mass* d.mass_multiplier, 
+        radius: d.radius_wrt === 'Earth' ? earth_radius*d.radius_multiplier : jupiter_radius* d.radius_multiplier, 
+        mass: d.mass_wrt === 'Earth' ? earth_mass*d.mass_multiplier : jupiter_mass* d.mass_multiplier, 
     }));
-    console.log(planets_data)
+    console.log(data)
     radiusScale = d3.scaleLinear()
-            .domain([d3.min(planets_data, d => d.radius), d3.max(planets_data, d => d.radius)]) // Input domain
-            .range([2,15]); // Output range
-    
+            .domain([Math.min(earth_radius, d3.min(data, d => d.radius)), d3.max(data, d => d.radius)]) // Input domain
+            .range([radiusMin,radiusMax]); // Output range
+    d_min = d3.min(data, d => d.distance);
+    d_max = d3.max(data, d => d.distance);
     distanceScale = d3.scaleLinear()
-                    .domain([d3.min(planets_data, d => d.distance), d3.max(planets_data, d => d.distance)]) // Input domain
-                    .range([30,100]); // Output range
+                    .domain([d_min*.89, d_max*1.13]) // Input domain
+                    .range([distanceMin,distanceMax]); // Output range
 
     $(document).ready(function () {
- 
-                drawSolarChart()
-                drawSeesaw()
+        // $('[x-axis-nav-value="Data.Health.Birth Rate"]').click();
+
+        dispatchEventForYear();
+
+                drawSolarChart();
+                drawSeesaw();
     });
+  });
+
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    // Select and show selected X-axis value
+    document.querySelectorAll('.wrt-nav').forEach(function (item) {
+      item.addEventListener('click', function () {
+        console.log('inside click functinos')
+        wrt_value = item.getAttribute('wrt-nav-value');
+        wrt_display = item.textContent
+        document.getElementById('wrt-nav-selected').textContent = wrt_display;
+        // updateChart('wrt');
+      });
+    });
+  
+
+    // Select and show selected year value
+    var yearInput = document.getElementById("year-input");
+    const slider = document.getElementById("slider");
+  
+    yearInput.addEventListener("change", function (event) {
+        console.log('input event occurrred')
+      event.stopPropagation();
+      
+      year = parseInt(yearInput.value);
+      slider.value = year;
+      console.log(year)
+      updateChart('year');
+    });
+    slider.addEventListener("input", function (event) {
+        
+      event.stopPropagation();
+      year = slider.value;
+  
+      yearInput.value = year;
+      updateChart('year');
+    });
+    document.querySelectorAll(' .year-event').forEach(function (item) {
+      item.addEventListener('click', function (event) {
+        event.stopPropagation();
+        year = parseInt(item.getAttribute('value'));
+  
+        yearInput.value = year;
+        slider.value = year;
+        updateChart('year');
+      });
+    });
+  
   });
 
 
@@ -319,80 +381,40 @@ function createElements(data) {
     return g
 }
 
+let scaledDistances = [50, 100, 150, 200, 250, 300];
 
-
-// Scaled distances for circular lines
-let scaledDistances = [50, 100, 150, 200, 250, 300, 350, 800, 900];
-
-// Define SVG container
-const svgWidth = 600;
-const svgHeight = 600;
-
-const svg = d3.select(".planet-chart-container")
+const planetSvg = d3.select(".planet-chart-container")
     .append("svg")
-    .attr("width", svgWidth)
-    .attr("height", svgHeight)
-    .style("border-radius", '50%')
+    .attr("width", planetChartWidth)
+    .attr("height", planetChartHeight)
+    .style("border-radius", '35%')
+let centralPlanetGroup = planetSvg.append("g").attr("transform", `translate(${planetChartWidth/2}, ${planetChartHeight / 2})`);
 
+const distanceCircles = planetSvg.selectAll("g.distance-circle-group")
+.data(scaledDistances)
+.enter().append("g")
+.attr("class", "distance-circle-group")
+.attr("transform", `translate(${planetChartWidth/2}, ${0})`);
+;
 
-
-// Create a group for the night sky background
-// const nightSky = svg.append("rect")
-//     .attr("width", svgWidth)
-//     .attr("height", svgHeight)
-//     .attr("fill", "black");
-
-// Create circles for stars
-// const starsData = Array.from({ length: 200 }, () => ({
-//     x: Math.random() * 1300,
-//     y: Math.random() * seesaw_height,
-//     radius: Math.random() * 1.5,
-//     color: "white",
-// }));
-
-// const stars = seesaw.selectAll("circle.star")
-//     .data(starsData)
-//     .enter().append("circle")
-//     .attr("class", "star")
-//     .attr("cx", d => d.x)
-//     .attr("cy", d => d.y)
-//     .attr("r", d => d.radius)
-//     .attr("fill", d => d.color);
-
+distanceCircles.append("circle")
+.attr("class", "distance-circle")
+.style('stroke-width', 2)
+.attr("cx", 0)
+.attr("cy", planetChartHeight / 2)
+.attr("r", d => d);
 
 function drawSolarChart(){
-    console.log('inside')
-    // Create a group for the central planet (Sun)
-    const centralPlanetGroup = svg.append("g")
-        .attr("transform", `translate(${svgWidth/2}, ${svgHeight / 2})`);
-
-
-    beeswarm = beeswarmForce()
-        .x(d => distanceScale(d.distance))
-        .y(svgHeight / 2)
-        .r(d => radiusScale(d.radius))
-    
-    let b_data = beeswarm(planets_data)
-
-    const planetTooltip = d3.select("body").append("div")
-    .attr("id", "planetTooltip")
-    .style("position", "absolute")
-    .style("border", "2px solid black")
-    .style("padding", "5px")
-    .style("opacity", 0.9)
-  
-    .style("display", "none");
-
-    // Create circles for each planet
+    let b_data = beeswarm(data)
     centralPlanetGroup
     .append("circle")
-    .attr("class", "planet")
-    .attr("cx", d => 0)
-    .attr("cy", d => 0)
-    .attr("r", d => 15)
-    .attr("fill", "skyblue")
+    .attr("class", "earth")
+    .attr("cx",  0)
+    .attr("cy",  0)
+    .attr("r", radiusScale(earth_radius))
+    .attr("fill", 'skyblue')
 
-    let planets = centralPlanetGroup.selectAll("circle.planet")
+    planets = centralPlanetGroup.selectAll("circle.planet")
         .data(b_data)
         .enter().append("circle")
         .attr("class", "planet")
@@ -401,69 +423,21 @@ function drawSolarChart(){
         .attr("r", d => d.r)
         .style("stroke", "black")
         .style("stroke-width", 1)
+        .style("opacity", 0.9)
         // .attr("r", d => radiusScale(d.radius))
         .attr("fill", d => colorScale(d.data.planet_type))
         
-        planets.on('mouseover', function (event, d) {
-
-            
-
-            d3.select(this)
-                .style('stroke-width', 2)
-                .attr('class', 'this.planet')
-            const xPosition = event.pageX + 10;
-            const yPosition = event.pageY - 30;
-            // console.log(d)
-            planetTooltip.html(`<strong>${d.data.name}</strong><br>Distance: ${d.data.distance} AU`)
-            planetTooltip.style('left', xPosition + 'px')
-                .style('top', yPosition + 'px');
-            planetTooltip.style('display', 'inline-block')
-            planetTooltip.style('background-color', colorScale(d.data.planet_type))
-
-            d3.selectAll(".planet").style('opacity', 0.2)
-            })
-        .on('mousemove', function (event, d) {
-            const xPosition = event.pageX + 10;
-            const yPosition = event.pageY - 30;
-            planetTooltip.style('left', xPosition + 'px')
-                .style('top', yPosition + 'px');
-            })
-        .on('mouseout', function () {
-            
-
-            d3.select(this)
-                .style('stroke-width', 1)
-                .attr('class', 'planet');
-            planetTooltip.style('display', 'none');
-            d3.selectAll(".planet").style('opacity', 1)
-            })
-        .on('click', function(event, d){
-
-            updateCircles(d.data.mass_multiplier, d.data.name, colorScale(d.data.planet_type));
-            // balanceSeesaw();
-        })
-
-
     // Add circular labels for the distance axis
-    const distanceCircles = svg.selectAll("g.distance-circle-group")
-        .data(scaledDistances)
-        .enter().append("g")
-        .attr("class", "distance-circle-group")
-        .attr("transform", `translate(${svgWidth/2}, ${0})`);
-        ;
 
-    distanceCircles.append("circle")
-        .attr("class", "distance-circle")
-        .style('stroke-width', 2)
-        .attr("cx", 0)
-        .attr("cy", svgHeight / 2)
-        .attr("r", d => d);
 
     distanceCircles.append("text")
         .attr("class", "distance-label")
+        .attr("text-anchor", "middle")
+        .attr("dominant-baseline", "middle")
+        .attr("font-size", "15px")
         .attr("x", d=> d*Math.cos(Math.PI/6))
-        .attr("y", d => Math.min(svgHeight, svgHeight/2 +  d*Math.sin(Math.PI/6)))
-        .text(d => `${d} AU`);
+        .attr("y", d => Math.min(planetChartHeight, planetChartHeight/2 +  d*Math.sin(Math.PI/6)))
+        .text(d => `${Math.ceil(distanceScale.invert(d))} ly`);
    
 }
         
@@ -476,10 +450,10 @@ beeswarmForce = function () {
     // console.log('beeswarm force called')
     let ticks = 500;
   
-    function beeswarm(data) {
+    function beeswarm(data1) {
       // console.log('beeswarm called')
   
-      const entries = data.map(d => {
+      const entries = data1.map(d => {
         return {
           x0: typeof x === "function" ? x(d) : x,
           y0: typeof y === "function" ? y(d) : y,
@@ -492,7 +466,7 @@ beeswarmForce = function () {
       const simulation = d3.forceSimulation(entries)
         .force("radial", d3.forceRadial(d => d.x0))
         // .force("y", d3.forceY(d => d.y0))
-        // .force("collide", d3.forceCollide(d => d.r));
+        .force("collide", d3.forceCollide(d => d.r));
   
       for (let i = 0; i < ticks; i++) simulation.tick();
   
@@ -506,4 +480,222 @@ beeswarmForce = function () {
   
     return beeswarm;
   }
+  
+const beeswarm = beeswarmForce()
+  .x(d => distanceScale(d.distance))
+  .y(planetChartHeight / 2)
+  .r(d => radiusScale(d.radius))
+
+  
+function updateChart(change) {
+    if (change == 'year') {
+      console.log('Year change event occured')
+      d3.selectAll('.fig-1').remove()
+      d3.selectAll('.fig-2').remove()
+      updateData()
+    
+      let b_data = beeswarm(data)
+      console.log('total data points are ' + JSON.stringify(b_data.length))
+      console.log(b_data)
+      planets = centralPlanetGroup.selectAll("circle.planet")
+        .data(b_data)
+        .join("circle")
+        .attr("class", "planet")
+        .transition()
+        .duration(1000)
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y)
+        .attr("r", d => d.r)
+        .style("stroke", "black")
+        .style("opacity", 0.9)
+        .style("stroke-width", 1)
+        .attr("fill", d => colorScale(d.data.planet_type))
+        .delay(function (d, i) { return (Math.min(i, 1800 )) })
+
+    }
+    
+    else if (change == 'x-axis') {
+      console.log('x-axis change event occured')
+      updateXminmax();
+      beeswarm_svg.selectAll('.x-axis-title')
+        .transition()
+        .duration(1000)
+        .style("opacity", 0)
+        .on('end', function () {
+          beeswarm_svg.select(".x-axis-line")
+            .transition()
+            .duration(1000)
+            .call(d3.axisBottom(xScale))
+            .on('end', function () {
+              beeswarm_svg.select('.x-axis-title')
+                .transition()
+                .duration(1000)
+                .text(x_axis_display)
+                .style("opacity", 1)
+                .on('end', function () {
+                  let b_data = beeswarm(data)
+                  g.selectAll('circle')
+                    .data(b_data, d => d.data.country)
+                    .join('circle')
+                    .transition()
+                    .duration(1000)
+                    .attr("cx", d => d.x)
+                    .attr("cy", d => d.y)
+                    .attr("r", d => d.r)
+                    .delay(function (d, i) { return (i * 5) })
+                });
+  
+            });
+        });
+  
+      updateData();
+      addToolTip()
+  
+  
+    }
+
+  
+    const planetTooltip = d3.select("body").append("div")
+    .attr("id", "planetTooltip")
+    .style("position", "absolute")
+    .style("border", "2px solid black")
+    .style("padding", "5px")
+    .style("opacity", 0.9)  
+    .style("display", "none");
+
+
+    centralPlanetGroup.selectAll("circle.planet").on('mouseover', function (event, d) {
+        d3.select(this)
+            .style('stroke-width', 2)
+            .attr('class', 'this.planet')
+        const xPosition = event.pageX + 10;
+        const yPosition = event.pageY - 30;
+        // console.log(d)
+        planetTooltip.html(`<strong>${d.data.name}</strong><br>Distance: ${d.data.distance} AU <br>Planet Type: ${d.data.planet_type}`)
+        planetTooltip.style('left', xPosition + 'px')
+            .style('top', yPosition + 'px');
+        planetTooltip.style('display', 'inline-block')
+        planetTooltip.style('background-color', colorScale(d.data.planet_type))
+
+        d3.selectAll(".planet").style('opacity', 0.2)
+        })
+    .on('mousemove', function (event, d) {
+        const xPosition = event.pageX + 10;
+        const yPosition = event.pageY - 30;
+        planetTooltip.style('left', xPosition + 'px')
+            .style('top', yPosition + 'px');
+        })
+    .on('mouseout', function () {
+        
+
+        d3.select(this)
+            .style('stroke-width', 1)
+            .attr('class', 'planet');
+        planetTooltip.style('display', 'none');
+        d3.selectAll(".planet").style('opacity', 1)
+        })
+    .on('click', function(event, d){
+
+        updateCircles(d.data.mass_multiplier, d.data.name, colorScale(d.data.planet_type));
+        // balanceSeesaw();
+    })
+}
+
+
+function updateData() {
+    
+    data = planets_data.filter(d=>parseInt(d.discovery_year)===parseInt(year)).map(d => ({
+        ...d, 
+        radius: d.radius_wrt === 'earth' ? earth_radius*d.radius_multiplier : jupiter_radius* d.radius_multiplier, 
+        mass: d.mass_wrt === 'earth' ? earth_mass*d.mass_multiplier : jupiter_mass* d.mass_multiplier, 
+    }));
+    data = data.slice(0,400)
+
+    console.log('updated data is')
+    console.log(data)
+    if(data.length!==0){
+    radiusScale = d3.scaleLinear()
+                .domain([Math.min(earth_radius, d3.min(data, d => d.radius)), d3.max(data, d => d.radius)]) // Input domain
+                    .range([radiusMin,radiusMax]); // Output range
+
+    d_min = d3.min(data, d => d.distance);
+    d_max = d3.max(data, d => d.distance);
+    distanceScale = d3.scaleLinear()
+                    .domain([d_min*.89, d_max*1.13]) // Input domain
+                    .range([distanceMin,distanceMax]); // Output range
+
+    distanceCircles.selectAll('text')
+        .transition()
+        .duration(500)
+        .style("opacity", 0)
+        .on('end', function () {
+            distanceCircles.selectAll("text")
+            .transition()
+            .duration(500)
+            .text(d => `${Math.ceil(distanceScale.invert(d))} ly`)
+            .style("opacity", 1);
+        });
+    }
+  }
+
+
+function dispatchEventForYear() {
+    console.log('Year is ' + year);
+    const slider = document.getElementById("slider");
+    slider.value = year;
+  
+    const inputEvent = new Event("input", {
+      bubbles: true,
+      cancelable: true,
+    });
+    slider.dispatchEvent(inputEvent);
+  }
+
+var currently_playing = false;
+var each_year_time;
+
+function play_animation_pleaaaassssseeeee() {
+currently_playing = true;
+dispatchEventForYear();
+let animation_time = 2000;
+if(year===2014 || year===2016){
+    animation_time = 2000;
+}
+
+each_year_time = setInterval(function () {
+    year++;
+    if (year <= 2023) {
+    dispatchEventForYear();
+    if (year == 2023) {
+        togglePlayPause()
+    }
+    } else {
+
+    stoooooopiiitttttttt();
+    }
+}, animation_time);
+}
+
+
+function stoooooopiiitttttttt() {
+currently_playing = false;
+clearInterval(each_year_time);
+}
+
+function togglePlayPause() {
+var playIcon = document.getElementById("playIcon");
+var playText = document.getElementById("playText");
+
+if (!currently_playing) {
+    play_animation_pleaaaassssseeeee();
+    playIcon.className = "fas fa-pause";
+    playText.textContent = "Pause";
+    currently_playing = true;
+} else {
+    stoooooopiiitttttttt();
+    playIcon.className = "fas fa-play";
+    playText.textContent = "Play";
+    currently_playing = false;
+}
+}
   

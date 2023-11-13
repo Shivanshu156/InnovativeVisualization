@@ -1,9 +1,3 @@
-/* .planet-chart-container,
-.seesaw-container {
-  /* width: 750px; */
-  /* height: 500px;
-  padding: 10px; */
-
   #chart-container {
     display: flex;
     width: 1100px;
@@ -44,4 +38,30 @@ height:700px;
   }
 .container{
     background-color: black;
+}
+
+.navbar-collapse {
+  height: 40px;
+}
+
+body {
+    background-color: black;
+    color: white;
+}
+circle.distance-circle {
+    fill: none;
+    stroke: white;
+    stroke-dasharray: 3;
+}
+text.distance-label {
+    fill: white;
+    text-anchor: middle;
+}
+.seesaw{
+    background-color: black;
+}
+
+.navbar{
+    padding-top: 15px;
+    margin-bottom: 20px;
 }
