@@ -10,10 +10,10 @@ let jupiter_mass = 1898.13
 let earth_radius = 3958.8
 let jupiter_radius = 43441
 let wrt = 'earth'
-// let wrt_color = 'skyblue'
+// let wrt_color = '#3498DB'
 let radiusScale
 let year = 1992;
-let distanceMin = 50, distanceMax = 250;
+let distanceMin = 50, distanceMax = 200;
 let d_min, d_max;
 let radiusMin = 5, radiusMax = 20;
 // let seesawEarth
@@ -34,7 +34,8 @@ Promise.all([d3.csv('data/cleaned_5250.csv', (d) => { return d })])
     // console.log(planets_data)
     planet_types = Array.from(new Set(planets_data.map(item => item.planet_type)));
     console.log(planet_types)
-    colorScale = d3.scaleOrdinal().domain(planet_types).range(d3.schemeCategory10);
+    // colorScale = d3.scaleOrdinal().domain(planet_types).range(d3.schemeCategory10);
+    colorScale = d3.scaleOrdinal().domain(planet_types).range([ '#145A32', '#C0392B', '#7D3C98', '#6E2C00', '#D4AC0D']);
     data = planets_data.filter(d=>d.discovery_year<=year).map(d => ({
         ...d, 
         radius: d.radius_wrt === 'Earth' ? earth_radius*d.radius_multiplier : jupiter_radius* d.radius_multiplier, 
@@ -188,7 +189,7 @@ function drawSeesawJupiter(){
 
 function updateCirclesEarth(n, mass_wrt, name, color) {
     console.log('ionside update circles')
-    let wrt_color = 'skyblue'
+    let wrt_color = '#3498DB'
     if (mass_wrt==='Jupiter'){
        n = n*jupiter_mass/earth_mass;
     }    
@@ -223,7 +224,7 @@ function updateCirclesEarth(n, mass_wrt, name, color) {
 
 function updateCirclesJupiter(n, mass_wrt, name, color) {
     console.log('ionside update circles')
-    let wrt_color = 'orange'
+    let wrt_color = '#DC7633'
     if (mass_wrt==='Earth'){
        n = n*earth_mass/jupiter_mass;
     }    
@@ -301,8 +302,8 @@ function balanceSeesawEarth(n, name) {
                     seesawEarth = d3.select('.seesawEarth')
                     seesawEarth.append('text')
                     .attr("class", "seesawEarth-info")
-                    .attr("transform", `translate(${seesawEarth_width/2 }, ${seesawEarth_height/5})`)
-                    .text(`1 ${name} = ${parseFloat(n).toFixed(3)} Earth`)
+                    .attr("transform", `translate(${seesawEarth_width/2 }, ${seesawEarth_height/4})`)
+                    .text(`1 (${name}) = ${parseFloat(n).toFixed(3)} (Earth)`)
                     .attr("font-size", "15px")
                     .attr("text-anchor", "middle") 
                     .attr("dominant-baseline", "middle")
@@ -362,8 +363,8 @@ function balanceSeesawJupiter(n, name) {
                     seesawJupiter = d3.select('.seesawJupiter')
                     seesawJupiter.append('text')
                     .attr("class", "seesawJupiter-info")
-                    .attr("transform", `translate(${seesawJupiter_width/2 }, ${seesawJupiter_height/5})`)
-                    .text(`1 ${name} = ${parseFloat(n).toFixed(3)} Jupiter`)
+                    .attr("transform", `translate(${seesawJupiter_width/2 }, ${seesawJupiter_height/4})`)
+                    .text(`1 (${name}) = ${parseFloat(n).toFixed(3)} (Jupiter)`)
                     .attr("font-size", "15px")
                     .attr("text-anchor", "middle") 
                     .attr("dominant-baseline", "middle")
@@ -555,7 +556,7 @@ function drawSolarChart(){
     .attr("cx",  0)
     .attr("cy",  0)
     .attr("r", radiusScale(earth_radius))
-    .attr("fill", 'skyblue')
+    .attr("fill", '#3498DB')
 
     planets = centralPlanetGroup.selectAll("circle.planet")
         .data(b_data)
@@ -635,6 +636,8 @@ function updateChart(change) {
       console.log('Year change event occured')
       d3.selectAll('.fig-1').remove()
       d3.selectAll('.fig-2').remove()
+      d3.selectAll('.fig-3').remove()
+      d3.selectAll('.fig-4').remove()
       updateData()
     
       let b_data = beeswarm(data)
@@ -714,7 +717,7 @@ function updateChart(change) {
         const xPosition = event.pageX + 10;
         const yPosition = event.pageY - 30;
         // console.log(d)
-        planetTooltip.html(`<strong>${d.data.name}</strong><br>Distance: ${d.data.distance} AU <br>Planet Type: ${d.data.planet_type}`)
+        planetTooltip.html(`<strong>${d.data.name}</strong><br>Distance: ${d.data.distance} ly <br>Planet Type: ${d.data.planet_type}`)
         planetTooltip.style('left', xPosition + 'px')
             .style('top', yPosition + 'px');
         planetTooltip.style('display', 'inline-block')

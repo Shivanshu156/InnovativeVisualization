@@ -25,7 +25,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button> -->
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto  mb-lg-4">
+                <!-- <ul class="navbar-nav me-auto  mb-lg-4">
 
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
@@ -45,23 +45,61 @@
                         <a class="nav-link active text" aria-current="page"><span id="wrt-nav-selected"></span></a>
                     </li>
 
-                </ul>
-                <ul class="navbar-nav ml-auto year-container">
-                    <li class="nav-item">
-                        <a class="nav-link nav-option" aria-current="page">Discovery Year &nbsp;
-                            <input type="range" id="slider" min="1992" max="2023" value="1993">
-                            <input type="text" id="year-input" value="1993" class="text-input">
+                </ul> -->
+                
+                <ul class="navbar-nav me-auto">
+                    <li  class="nav-item"> 
+                        <a class="nav-link active text" aria-current="page"><span id="size-selected"> Planet Types</span></a>
+                    </li>
+                    <li  class="nav-item">
+                        <a class="nav-link active text" aria-current="page">
+                            <div class="color-block" style="background-color: #145A32;"></div>
+                            <span class="color-name"> Gas Giant </span>
                         </a>
                     </li>
-                    <li class="">
-                        <button id="playButton" class="btn btn-primary play-button" onclick="togglePlayPause();">
-                            <i id="playIcon" class="fas fa-play"></i>
-                            <!-- <span id="playText">Play</span> -->
-                        </button>
+                    <li  class="nav-item">
+                        <a class="nav-link active text" aria-current="page">
+                            <div class="color-block" style="background-color: #C0392B;"></div>
+                            <span class="color-name"> Super Earth </span>
+                        </a>
                     </li>
-                    <a class='year-event' value=1993></a>
+                    <li  class="nav-item">
+                        <a class="nav-link active text" aria-current="page">
+                            <div class="color-block" style="background-color: #7D3C98;"></div>
+                            <span class="color-name"> Neptune-like </span>
+                        </a>
+                    </li>
+                    <li  class="nav-item">
+                        <a class="nav-link active text" aria-current="page">
+                            <div class="color-block" style="background-color: #6E2C00;"></div>
+                            <span class="color-name"> Terresterial </span>
+                        </a>
+                    </li>
+                    <li  class="nav-item">
+                        <a class="nav-link active text" aria-current="page">
+                            <div class="color-block" style="background-color: #D4AC0D;"></div>
+                            <span class="color-name"> Unknown </span>
+                        </a>
+                    </li>
+
+
                 </ul>
 
+    <ul class="navbar-nav ml-auto year-container">
+        <li class="nav-item">
+            <a class="nav-link nav-option" aria-current="page">Discovery Year &nbsp;
+                <input type="range" id="slider" min="1992" max="2023" value="1993">
+                <input type="text" id="year-input" value="1993" class="text-input">
+            </a>
+        </li>
+        <li class="">
+            <button id="playButton" class="btn btn-primary play-button" onclick="togglePlayPause();">
+                <i id="playIcon" class="fas fa-play"></i>
+                <!-- <span id="playText">Play</span> -->
+            </button>
+        </li>
+        <a class='year-event' value=1993></a>
+    </ul>
             </div>
         </div>
     </nav>

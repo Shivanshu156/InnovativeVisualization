@@ -65,3 +65,18 @@ text.distance-label {
     padding-top: 15px;
     margin-bottom: 20px;
 }
+
+.color-block {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border: 1px solid #fff;
+}
+
+/* Text styling */
+.color-name {
+    color: #fff;
+    font-size: 14px;
+    vertical-align: middle;
+}
