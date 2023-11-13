@@ -145,14 +145,15 @@ function drawSeesaw(){
 }
 
 
-function updateCircles(n, name, color) {
+function updateCircles(n, mass_wrt, name, color) {
     console.log('ionside update circles')
-    if (wrt==='earth'){
-        wrt_color = 'skyblue'
+    wrt_color = 'skyblue'
+    if (mass_wrt==='Jupiter'){
+       n = n*jupiter_mass/earth_mass;
     }    
-    else{
-        wrt_color='orange'
-    }
+    // else{
+        
+    // }
     // d3.selectAll('.seesaw').remove()
     d3.selectAll('.fig-1').transition().duration(100).attr("transform", `translate(0, -100)`);
     d3.selectAll('.fig-2').transition().duration(100).attr("transform", `translate(${300-g2_width}, -100)`)
@@ -225,7 +226,7 @@ function balanceSeesaw(n, name) {
                     seesaw.append('text')
                     .attr("class", "seesaw-info")
                     .attr("transform", `translate(${seesaw_width/2 }, ${seesaw_height/5})`)
-                    .text(`1 ${name} = ${n} ${wrt.toLocaleLowerCase()}`)
+                    .text(`1 ${name} = ${parseFloat(n).toFixed(3)} ${wrt.toLocaleLowerCase()}`)
                     .attr("font-size", "20px")
                     .attr("text-anchor", "middle") // Align text in the center horizontally
                     .attr("dominant-baseline", "middle")
@@ -596,7 +597,7 @@ function updateChart(change) {
         })
     .on('click', function(event, d){
 
-        updateCircles(d.data.mass_multiplier, d.data.name, colorScale(d.data.planet_type));
+        updateCircles(d.data.mass_multiplier, d.data.mass_wrt, d.data.name, colorScale(d.data.planet_type));
         // balanceSeesaw();
     })
 }
