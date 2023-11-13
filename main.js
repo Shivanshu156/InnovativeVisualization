@@ -1,4 +1,5 @@
 var g1, g2, g2_height = 80, g2_width=80;
+var g3, g4, g4_height = 80, g4_width=80;
 let colorScale;
 let planets_data;
 let planets;
@@ -9,19 +10,22 @@ let jupiter_mass = 1898.13
 let earth_radius = 3958.8
 let jupiter_radius = 43441
 let wrt = 'earth'
-let wrt_color = 'skyblue'
+// let wrt_color = 'skyblue'
 let radiusScale
 let year = 1992;
 let distanceMin = 50, distanceMax = 250;
 let d_min, d_max;
 let radiusMin = 5, radiusMax = 20;
-// let seesaw
-let seesaw_height = 300;
-let seesaw_width = 400;
+// let seesawEarth
+let seesawEarth_height = 300;
+let seesawEarth_width = 400;
+let seesawJupiter_height = 300;
+let seesawJupiter_width = 400;
 let planetChartWidth = 600;
 let planetChartHeight = 600;
 let margin = { top: 0, right: 40, bottom: 40, left: 20 };
-let seesaw = d3.select(".seesaw-container").append('svg').attr('height', seesaw_height).attr('width',seesaw_width ).attr('class','seesaw');
+let seesawEarth = d3.select(".seesawEarth-container").append('svg').attr('height', seesawEarth_height).attr('width',seesawEarth_width ).attr('class','seesawEarth');
+let seesawJupiter = d3.select(".seesawJupiter-container").append('svg').attr('height', seesawJupiter_height).attr('width',seesawJupiter_width ).attr('class','seesawJupiter');
 
 Promise.all([d3.csv('data/cleaned_5250.csv', (d) => { return d })])
   .then(function (csv_data) {
@@ -52,7 +56,8 @@ Promise.all([d3.csv('data/cleaned_5250.csv', (d) => { return d })])
         dispatchEventForYear();
 
                 drawSolarChart();
-                drawSeesaw();
+                drawSeesawEarth();
+                drawSeesawJupiter();
     });
   });
 
@@ -110,9 +115,9 @@ document.addEventListener("DOMContentLoaded", function () {
 let dropRange = 200
 
 
-function drawSeesaw(){
+function drawSeesawEarth(){
     
-    const group = seesaw.append("g")
+    const group = seesawEarth.append("g")
     .attr("transform", `translate(0,${dropRange})`);
 
     group.append("path")
@@ -130,40 +135,76 @@ function drawSeesaw(){
         .attr("stroke", "white")
         .attr("stroke-width", 4);
 
-    seesaw.append('text')
-        .attr('class', 'seesaw-label')
-        .attr('x', seesaw_width / 2 - margin.right )
-        .attr('y', seesaw_height )
-        .text("Mass Scale")
+    seesawEarth.append('text')
+        .attr('class', 'seesawEarth-label')
+        .attr('x', seesawEarth_width / 2 - margin.right -margin.left - 10)
+        .attr('y', seesawEarth_height -10)
+        .text("Mass Scale Earth")
+        .attr("font-size", "20px")
+        // .attr("text-anchor", "middle") 
+        // .attr("dominant-baseline", "middle")
+        .style("stroke", "white");
+
+    seesawEarth.append('g').attr('class', 'fig-1')
+    seesawEarth.append('g').attr('class', 'fig-2')
+    seesawEarth.append('text').attr('class', 'seesawEarth-info')
+
+}
+
+function drawSeesawJupiter(){
+    
+    const group = seesawJupiter.append("g")
+    .attr("transform", `translate(0,${dropRange})`);
+
+    group.append("path")
+        .attr("id", "triangle")
+        .attr("d", "M 200 20 L 180 60 L 220 60 Z")
+        .attr("fill", "lightblue");
+
+    // Append a line element for the horizontal line
+    group.append("line")
+        .attr("id", "line")
+        .attr("x1", 100)
+        .attr("y1", 20)
+        .attr("x2", 300)
+        .attr("y2", 20)
+        .attr("stroke", "white")
+        .attr("stroke-width", 4);
+
+    seesawJupiter.append('text')
+        .attr('class', 'seesawJupiter-label')
+        .attr('x', seesawJupiter_width / 2 - margin.right - margin.left -15)
+        .attr('y', seesawJupiter_height -10)
+        .text("Mass Scale Jupiter")
         .attr("font-size", "20px")
         .style("stroke", "white");
 
-    seesaw.append('g').attr('class', 'fig-1')
-    seesaw.append('g').attr('class', 'fig-2')
-    seesaw.append('text').attr('class', 'seesaw-info')
+    seesawJupiter.append('g').attr('class', 'fig-3')
+    seesawJupiter.append('g').attr('class', 'fig-4')
+    seesawJupiter.append('text').attr('class', 'seesawJupiter-info')
 
 }
 
 
-function updateCircles(n, mass_wrt, name, color) {
+function updateCirclesEarth(n, mass_wrt, name, color) {
     console.log('ionside update circles')
-    wrt_color = 'skyblue'
+    let wrt_color = 'skyblue'
     if (mass_wrt==='Jupiter'){
        n = n*jupiter_mass/earth_mass;
     }    
     // else{
         
     // }
-    // d3.selectAll('.seesaw').remove()
+    // d3.selectAll('.seesawEarth').remove()
     d3.selectAll('.fig-1').transition().duration(100).attr("transform", `translate(0, -100)`);
     d3.selectAll('.fig-2').transition().duration(100).attr("transform", `translate(${300-g2_width}, -100)`)
-    d3.selectAll('.seesaw-info').transition().duration(100).style('opacity', 0)
+    d3.selectAll('.seesawEarth-info').transition().duration(100).style('opacity', 0)
     .on("end", function(){
 
-        seesaw = d3.select(".seesaw");
-        g1 = seesaw.append("g").attr("class", "fig-1").attr("transform", "translate(0, -100)");
+        seesawEarth = d3.select(".seesawEarth");
+        g1 = seesawEarth.append("g").attr("class", "fig-1").attr("transform", "translate(0, -100)");
         const elementsArray = generateCircles(n, g2_width, g2_height, wrt_color); 
-        g2  = createElements(elementsArray).attr("class", "fig-2").attr("transform", `translate(${200-g2_width}, -100)`);
+        g2  = createElements(elementsArray, 'Earth').attr("class", "fig-2").attr("transform", `translate(${200-g2_width}, -100)`);
         g2_height = g2.node().getBoundingClientRect().height
         g2_width = g2.node().getBoundingClientRect().width
     
@@ -172,14 +213,49 @@ function updateCircles(n, mass_wrt, name, color) {
             .attr("cy", -20)
             .attr("r", 20)
             .attr("fill",color );
-        balanceSeesaw(n, name)
+        balanceSeesawEarth(n, name)
 
  
     });
 
 }
 
-function balanceSeesaw(n, name) {
+
+function updateCirclesJupiter(n, mass_wrt, name, color) {
+    console.log('ionside update circles')
+    let wrt_color = 'orange'
+    if (mass_wrt==='Earth'){
+       n = n*earth_mass/jupiter_mass;
+    }    
+    // else{
+        
+    // }
+    // d3.selectAll('.seesawEarth').remove()
+    d3.selectAll('.fig-3').transition().duration(100).attr("transform", `translate(0, -100)`);
+    d3.selectAll('.fig-4').transition().duration(100).attr("transform", `translate(${300-g2_width}, -100)`)
+    d3.selectAll('.seesawJupiter-info').transition().duration(100).style('opacity', 0)
+    .on("end", function(){
+
+        seesawJupiter = d3.select(".seesawJupiter");
+        g3 = seesawJupiter.append("g").attr("class", "fig-3").attr("transform", "translate(0, -100)");
+        const elementsArray = generateCircles(n, g4_width, g4_height, wrt_color); 
+        g4  = createElements(elementsArray, 'Jupiter').attr("class", "fig-4").attr("transform", `translate(${200-g4_width}, -100)`);
+        g4_height = g4.node().getBoundingClientRect().height
+        g4_width = g4.node().getBoundingClientRect().width
+    
+        g3.append("circle")
+            .attr("cx", 100)
+            .attr("cy", -20)
+            .attr("r", 20)
+            .attr("fill",color );
+        balanceSeesawJupiter(n, name)
+
+ 
+    });
+
+}
+
+function balanceSeesawEarth(n, name) {
 
     imbalance = 30
     const angleInRadians = imbalance * (Math.PI / 180);
@@ -191,7 +267,7 @@ function balanceSeesaw(n, name) {
     .duration(500)
     .attr("transform", `translate(0, &{dropRange})`)
     .on("end", function(){
-        seesaw.select("#line")
+        seesawEarth.select("#line")
             .transition()
             .duration(500)
             .attr("transform", `rotate(${-imbalance}, 200, 20)`) 
@@ -206,7 +282,7 @@ function balanceSeesaw(n, name) {
             .attr("transform", `translate(${300-g2_width/2-end1_dx}, ${dropRange-end1_dy-g2_height+5})`)
             .on("end", function(){
 
-                seesaw.select("#line")
+                seesawEarth.select("#line")
                 .transition()
                 .duration(500)
                 .attr("transform", `rotate(0, 200, 20)`) 
@@ -222,13 +298,13 @@ function balanceSeesaw(n, name) {
                 .attr("transform", `translate(${300-g2_width/2}, ${dropRange-g2_height+5})`)
                 .on("end", function(){
 
-                    seesaw = d3.select('.seesaw')
-                    seesaw.append('text')
-                    .attr("class", "seesaw-info")
-                    .attr("transform", `translate(${seesaw_width/2 }, ${seesaw_height/5})`)
-                    .text(`1 ${name} = ${parseFloat(n).toFixed(3)} ${wrt.toLocaleLowerCase()}`)
-                    .attr("font-size", "20px")
-                    .attr("text-anchor", "middle") // Align text in the center horizontally
+                    seesawEarth = d3.select('.seesawEarth')
+                    seesawEarth.append('text')
+                    .attr("class", "seesawEarth-info")
+                    .attr("transform", `translate(${seesawEarth_width/2 }, ${seesawEarth_height/5})`)
+                    .text(`1 ${name} = ${parseFloat(n).toFixed(3)} Earth`)
+                    .attr("font-size", "15px")
+                    .attr("text-anchor", "middle") 
                     .attr("dominant-baseline", "middle")
                     .style("stroke", "white");
                 })
@@ -238,6 +314,68 @@ function balanceSeesaw(n, name) {
     })
 
 }
+
+
+function balanceSeesawJupiter(n, name) {
+
+    imbalance = 30
+    const angleInRadians = imbalance * (Math.PI / 180);
+    const end1_dy =  100* Math.sin(angleInRadians)
+    const end1_dx = 100 - 100* Math.cos(angleInRadians)
+    // Update the position of the circles based on the imbalance
+
+    g3.transition()
+    .duration(500)
+    .attr("transform", `translate(0, &{dropRange})`)
+    .on("end", function(){
+        seesawJupiter.select("#line")
+            .transition()
+            .duration(500)
+            .attr("transform", `rotate(${-imbalance}, 200, 20)`) 
+
+        g3
+        .transition()
+        .duration(500)
+        .attr("transform", `translate(${end1_dx}, ${dropRange+end1_dy+5})`)
+        .on("end", function(){
+            g4.transition()
+            .duration(500)
+            .attr("transform", `translate(${300-g4_width/2-end1_dx}, ${dropRange-end1_dy-g4_height+5})`)
+            .on("end", function(){
+
+                seesawJupiter.select("#line")
+                .transition()
+                .duration(500)
+                .attr("transform", `rotate(0, 200, 20)`) 
+                
+                g3
+                .transition()
+                .duration(500)
+                .attr("transform", `translate(0, ${dropRange})`)
+
+                g4
+                .transition()
+                .duration(500)
+                .attr("transform", `translate(${300-g4_width/2}, ${dropRange-g4_height+5})`)
+                .on("end", function(){
+
+                    seesawJupiter = d3.select('.seesawJupiter')
+                    seesawJupiter.append('text')
+                    .attr("class", "seesawJupiter-info")
+                    .attr("transform", `translate(${seesawJupiter_width/2 }, ${seesawJupiter_height/5})`)
+                    .text(`1 ${name} = ${parseFloat(n).toFixed(3)} Jupiter`)
+                    .attr("font-size", "15px")
+                    .attr("text-anchor", "middle") 
+                    .attr("dominant-baseline", "middle")
+                    .style("stroke", "white");
+                })
+
+            })
+        })
+    })
+
+}
+
 
 function generateCircles(n, containerWidth, containerHeight, color) {
     let circles = [];
@@ -348,9 +486,13 @@ function generateCircles(n, containerWidth, containerHeight, color) {
     return circles;
 }
 
-function createElements(data) {
-    const g = seesaw.append('g')
-    .attr("transform", `translate(${g2_width/2}, ${g2_height/2})`);;
+function createElements(data, wrt) {
+    var g
+    if (wrt==='Earth'){
+     g = seesawEarth.append('g').attr("transform", `translate(${g2_width/2}, ${g2_height/2})`);}
+    else{
+     g = seesawJupiter.append('g').attr("transform", `translate(${g4_width/2}, ${g4_height/2})`);}
+
     g.append("rect")
     .attr("width", g2_width)
     .attr("height", g2_height)
@@ -597,8 +739,9 @@ function updateChart(change) {
         })
     .on('click', function(event, d){
 
-        updateCircles(d.data.mass_multiplier, d.data.mass_wrt, d.data.name, colorScale(d.data.planet_type));
-        // balanceSeesaw();
+        updateCirclesEarth(d.data.mass_multiplier, d.data.mass_wrt, d.data.name, colorScale(d.data.planet_type));
+        updateCirclesJupiter(d.data.mass_multiplier, d.data.mass_wrt, d.data.name, colorScale(d.data.planet_type));
+        // balanceSeesawEarth();
     })
 }
 

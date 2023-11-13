@@ -21,7 +21,7 @@ height:700px;
 
 }
 
-.seesaw-container {
+.seesawEarth-container {
     /* background-color: black; */
     flex-direction: row;
     width: 400px;
@@ -29,7 +29,7 @@ height:700px;
 
   }
 
-  .orbit-container {
+  .seesawJupiter-container {
     /* background-color: blue; */
     flex-direction: row;
     width: 400px;
@@ -57,7 +57,7 @@ text.distance-label {
     fill: white;
     text-anchor: middle;
 }
-.seesaw{
+.seesawEarth{
     background-color: black;
 }
 
