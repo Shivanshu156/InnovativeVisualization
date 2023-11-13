@@ -13,7 +13,7 @@ let wrt = 'earth'
 // let wrt_color = '#3498DB'
 let radiusScale
 let year = 1992;
-let distanceMin = 50, distanceMax = 200;
+let distanceMin = 50, distanceMax = 280;
 let d_min, d_max;
 let radiusMin = 5, radiusMax = 20;
 // let seesawEarth
@@ -638,6 +638,8 @@ function updateChart(change) {
       d3.selectAll('.fig-2').remove()
       d3.selectAll('.fig-3').remove()
       d3.selectAll('.fig-4').remove()
+      d3.selectAll('.seesawEarth-info').text('')
+      d3.selectAll('.seesawJupiter-info').text('')
       updateData()
     
       let b_data = beeswarm(data)
@@ -765,10 +767,10 @@ function updateData() {
                 .domain([Math.min(earth_radius, d3.min(data, d => d.radius)), d3.max(data, d => d.radius)]) // Input domain
                     .range([radiusMin,radiusMax]); // Output range
 
-    d_min = d3.min(data, d => d.distance);
-    d_max = d3.max(data, d => d.distance);
+    d_min = d3.min(data, d => parseFloat(d.distance));
+    d_max = d3.max(data, d => parseFloat(d.distance));
     distanceScale = d3.scaleLinear()
-                    .domain([d_min*.89, d_max*1.13]) // Input domain
+                    .domain([d_min*.89, d_max]) // Input domain
                     .range([distanceMin,distanceMax]); // Output range
 
     distanceCircles.selectAll('text')
