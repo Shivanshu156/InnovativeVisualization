@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,109 +13,110 @@
     <link rel="stylesheet" href="main.css">
 
 </head>
+
 <body>
     <div class="container" id="container">
-    <h3 class="text-center">NASA Exoplanets (Homework #4: Innovative Visualization Design)</h3>
-    <h3 class="text-center">Shivanshu Verma - sverma76@asu.edu</h3>
-    
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <!-- <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button> -->
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <!-- <ul class="navbar-nav me-auto  mb-lg-4">
+        <h3 class="text-center">NASA Exoplanets (Homework #4: Innovative Visualization Design)</h3>
+        <h3 class="text-center">Shivanshu Verma - sverma76@asu.edu</h3>
 
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Visualize with respect to
-                        
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><button class="dropdown-item wrt-nav" type="button" wrt-nav-value='earth'>Earth
-                                    </button></li>
-                            <li><button class="dropdown-item wrt-nav" type="button" wrt-nav-value='jupiter'>Jupiter
-                                    </button></li>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
 
-                        </ul>
-                    </li>
-                    <li class="nav-item ">
-                        <a class="nav-link active text" aria-current="page"><span id="wrt-nav-selected"></span></a>
-                    </li>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
-                </ul> -->
-                
-                <ul class="navbar-nav me-auto">
-                    <li  class="nav-item"> 
-                        <a class="nav-link active text" aria-current="page"><span id="size-selected"> Planet Types</span></a>
-                    </li>
-                    <li  class="nav-item">
-                        <a class="nav-link active text" aria-current="page">
-                            <div class="color-block" style="background-color: #145A32;"></div>
-                            <span class="color-name"> Gas Giant </span>
-                        </a>
-                    </li>
-                    <li  class="nav-item">
-                        <a class="nav-link active text" aria-current="page">
-                            <div class="color-block" style="background-color: #C0392B;"></div>
-                            <span class="color-name"> Super Earth </span>
-                        </a>
-                    </li>
-                    <li  class="nav-item">
-                        <a class="nav-link active text" aria-current="page">
-                            <div class="color-block" style="background-color: #7D3C98;"></div>
-                            <span class="color-name"> Neptune-like </span>
-                        </a>
-                    </li>
-                    <li  class="nav-item">
-                        <a class="nav-link active text" aria-current="page">
-                            <div class="color-block" style="background-color: #6E2C00;"></div>
-                            <span class="color-name"> Terresterial </span>
-                        </a>
-                    </li>
-                    <li  class="nav-item">
-                        <a class="nav-link active text" aria-current="page">
-                            <div class="color-block" style="background-color: #D4AC0D;"></div>
-                            <span class="color-name"> Unknown </span>
-                        </a>
-                    </li>
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active text" aria-current="page"><span id="size-selected"> Planet
+                                    Types</span></a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active text" aria-current="page">
+                                <div class="color-block" style="background-color: #145A32;"></div>
+                                <span class="color-name"> Gas Giant </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active text" aria-current="page">
+                                <div class="color-block" style="background-color: #C0392B;"></div>
+                                <span class="color-name"> Super Earth </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active text" aria-current="page">
+                                <div class="color-block" style="background-color: #7D3C98;"></div>
+                                <span class="color-name"> Neptune-like </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active text" aria-current="page">
+                                <div class="color-block" style="background-color: #6E2C00;"></div>
+                                <span class="color-name"> Terresterial </span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active text" aria-current="page">
+                                <div class="color-block" style="background-color: #D4AC0D;"></div>
+                                <span class="color-name"> Unknown </span>
+                            </a>
+                        </li>
 
 
+                    </ul>
+
+                    <ul class="navbar-nav ml-auto year-container">
+                        <li class="nav-item">
+                            <a class="nav-link nav-option" aria-current="page">Discovery Year &nbsp;
+                                <input type="range" id="slider" min="1992" max="2023" value="1993">
+                                <input type="text" id="year-input" value="1993" class="text-input">
+                            </a>
+                        </li>
+                        <li class="">
+                            <button id="playButton" class="btn btn-primary play-button" onclick="togglePlayPause();">
+                                <i id="playIcon" class="fas fa-play"></i>
+                                <!-- <span id="playText">Play</span> -->
+                            </button>
+                        </li>
+                        <a class='year-event' value=1993></a>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        <div id="chart-container" width="1300" height="500">
+            <div width="600" height="500" class="planet-chart-container">
+
+            </div>
+            <div width="400" height="700" class="right-container">
+                <div width="400" height="350" class="seesawEarth-container"></div>
+                <div width="400" height="350" class="seesawJupiter-container"></div>
+            </div>
+            <div width="300" height="700" class="description-container">
+                <h3 class="text-center">Description</h3>
+                <!-- <h6>Interactions:</h6> -->
+                <ul >
+                    <li style="padding-bottom: 10px">
+                        We visualize all the planets discovered in selected year. We can play animation to visualize year wise for all the years.
+                    </li>
+                    <li style="padding-bottom: 10px">
+                        The size of circle is directly proportional to the radius of planet.
+                    </li>
+                    <li style="padding-bottom: 10px">
+                        The color of the circle represents planet type, earth is sky blue, jupiter is orange.
+                    </li>
+                    <li style="padding-bottom: 10px">
+                        Concentric dotted circles represent the radial distance in light years (scaled different for each year) from the earth.
+                    </li>
+                    <li style="padding-bottom: 10px">
+                        Hovering over planets display tooltip, blurrs everything but earth and planet, clicking on them give mass visualization.
+                    </li>
+                    <li style="padding-bottom: 10px">
+                        Mass scale is a novel visualization where we put # of earths/jupiters on one end whose mass is equivalent to 1 planet.
+                    </li>
                 </ul>
-
-    <ul class="navbar-nav ml-auto year-container">
-        <li class="nav-item">
-            <a class="nav-link nav-option" aria-current="page">Discovery Year &nbsp;
-                <input type="range" id="slider" min="1992" max="2023" value="1993">
-                <input type="text" id="year-input" value="1993" class="text-input">
-            </a>
-        </li>
-        <li class="">
-            <button id="playButton" class="btn btn-primary play-button" onclick="togglePlayPause();">
-                <i id="playIcon" class="fas fa-play"></i>
-                <!-- <span id="playText">Play</span> -->
-            </button>
-        </li>
-        <a class='year-event' value=1993></a>
-    </ul>
             </div>
         </div>
-    </nav>
-    <div id="chart-container" width="1300" height="500">
-        <div width="600" height="500" class="planet-chart-container" >
-
-        </div>
-        <div width="400" height="700" class="right-container" >
-            <div width="400" height="350" class="seesawEarth-container"></div>
-            <div width="400" height="350" class="seesawJupiter-container"></div>
-        </div>
-
     </div>
-</div>
     <script src="main.js">
     </script>
 </body>
+
 </html>
