@@ -40,10 +40,10 @@ height:700px;
   height: 300px;
 
   }
-.container{
+/* .container{
     /* background-color: rgba(0, 0, 0, 0.1); */
     
-}
+/* } */ 
 
 .navbar-collapse {
   height: 40px;
@@ -62,10 +62,10 @@ text.distance-label {
     fill: white;
     text-anchor: middle;
 }
-.seesawEarth{
+/* .seesawEarth{
     /* background-color: rgba(0, 0, 0, 0.1); */
     
-}
+/* } */ 
 
 .navbar{
     padding-top: 15px;
@@ -89,7 +89,9 @@ text.distance-label {
 
 body {
      /* Remove default margin */
-    overflow: hidden; /* Hide scrollbars */
+    /* overflow: hidden; */
+    overflow: auto;
+     /* Hide scrollbars */
 }
 
 video {

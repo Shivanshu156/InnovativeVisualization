@@ -31,11 +31,84 @@ Promise.all([d3.csv('data/cleaned_5250.csv', (d) => { return d })])
   .then(function (csv_data) {
     console.log('loaded planets data');
     planets_data = csv_data[0];
-    // console.log(planets_data)
     planet_types = Array.from(new Set(planets_data.map(item => item.planet_type)));
     console.log(planet_types)
-    // colorScale = d3.scaleOrdinal().domain(planet_types).range(d3.schemeCategory10);
     colorScale = d3.scaleOrdinal().domain(planet_types).range([ '#145A32', '#C0392B', '#7D3C98', '#6E2C00', '#D4AC0D']);
+    
+    planet_types.forEach(function(d){
+        console.log(d)
+        console.log('planet ttype')
+        centralPlanetGroup.append("defs")
+        .append("linearGradient")        
+        .attr("id",`planetGradient_${d.replace(/ /g, "_")}`) 
+
+            .attr("x1", "0%")
+            .attr("y1", "0%")
+            .attr("x2", "100%")
+            .attr("y2", "0%")
+            .selectAll("stop")
+            .data([
+                { offset: "0%", color:"#ffffff", opacity: 0.6 },
+                { offset: "20%", color: colorScale(d), opacity: 1 },
+                { offset: "100%", color: colorScale(d), opacity: .1 } 
+            ])
+        .enter()
+        .append("stop")
+        .attr("offset", stop => stop.offset)
+        .attr("stop-color", stop => stop.color)
+        .attr("stop-opacity", stop => stop.opacity);
+    
+    })
+    let other_planets = ['earth', 'jupiter']
+    other_planets_scale = {'earth':"#3498DB", 'jupiter':"#DC7633"}
+
+  
+    centralPlanetGroup.append("defs")
+    .append("linearGradient")        
+    .attr("id",'planetGradient_earth') 
+        .attr("x1", "0%")
+        .attr("y1", "100%")
+        .attr("x2", "10%")
+        .attr("y2", "0%")
+        .selectAll("stop")
+        .data([
+            { offset: "0%", color: "#ffffff", opacity: 1 },
+            { offset: "10%", color: other_planets_scale['earth'], opacity: 1 },
+            // { offset: "40%", color: "#ffffff", opacity: 1 },
+            { offset: "75%", color: other_planets_scale['earth'], opacity: 1 },
+            { offset: "100%", color: "#ffffff", opacity: 1  } 
+        ])
+    .enter()
+    .append("stop")
+    .attr("offset", stop => stop.offset)
+    .attr("stop-color", stop => stop.color)
+    .attr("stop-opacity", stop => stop.opacity);
+
+
+
+    centralPlanetGroup.append("defs")
+    .append("linearGradient")        
+    .attr("id",'planetGradient_jupiter') 
+        .attr("x1", "0%")
+        .attr("y1", "100%")
+        .attr("x2", "0%")
+        .attr("y2", "0%")
+        .selectAll("stop")
+        .data([
+            { offset: "0%", color: "#ffffff", opacity: 1 },
+            { offset: "20%", color: other_planets_scale['jupiter'], opacity: 1 },
+            { offset: "40%", color: "#ffffff", opacity: 1 },
+            { offset: "60%", color: other_planets_scale['jupiter'], opacity: 1 },
+            { offset: "100%", color: "#ffffff", opacity: 1  } 
+        ])
+    .enter()
+    .append("stop")
+    .attr("offset", stop => stop.offset)
+    .attr("stop-color", stop => stop.color)
+    .attr("stop-opacity", stop => stop.opacity);
+    
+
+
     data = planets_data.filter(d=>d.discovery_year<=year).map(d => ({
         ...d, 
         radius: d.radius_wrt === 'Earth' ? earth_radius*d.radius_multiplier : jupiter_radius* d.radius_multiplier, 
@@ -53,7 +126,8 @@ Promise.all([d3.csv('data/cleaned_5250.csv', (d) => { return d })])
 
     $(document).ready(function () {
         // $('[x-axis-nav-value="Data.Health.Birth Rate"]').click();
-
+        d3.selectAll('#gas-giant')
+        .style('background-color', 'url(#planetGradient_Gas_Giant)')
         dispatchEventForYear();
 
                 drawSolarChart();
@@ -189,7 +263,7 @@ function drawSeesawJupiter(){
 
 function updateCirclesEarth(n, mass_wrt, name, color) {
     console.log('ionside update circles')
-    let wrt_color = '#3498DB'
+    let wrt_color = 'url(#planetGradient_earth)'
     if (mass_wrt==='Jupiter'){
        n = n*jupiter_mass/earth_mass;
     }    
@@ -224,7 +298,7 @@ function updateCirclesEarth(n, mass_wrt, name, color) {
 
 function updateCirclesJupiter(n, mass_wrt, name, color) {
     console.log('ionside update circles')
-    let wrt_color = '#DC7633'
+    let wrt_color = 'url(#planetGradient_jupiter)'
     if (mass_wrt==='Earth'){
        n = n*earth_mass/jupiter_mass;
     }    
@@ -569,7 +643,7 @@ function drawSolarChart(){
         .style("stroke-width", 1)
         .style("opacity", 0.9)
         // .attr("r", d => radiusScale(d.radius))
-        .attr("fill", d => colorScale(d.data.planet_type))
+        .attr("fill", d => `url(#planetGradient_${d.data.planet_type.replace(/ /g, "_")})`)
         
     // Add circular labels for the distance axis
 
@@ -657,51 +731,11 @@ function updateChart(change) {
         .style("stroke", "black")
         .style("opacity", 0.9)
         .style("stroke-width", 1)
-        .attr("fill", d => colorScale(d.data.planet_type))
+        .attr("fill", d => `url(#planetGradient_${d.data.planet_type.replace(/ /g, "_")})`)
         .delay(function (d, i) { return (Math.min(i, 1800 )) })
 
     }
     
-    else if (change == 'x-axis') {
-      console.log('x-axis change event occured')
-      updateXminmax();
-      beeswarm_svg.selectAll('.x-axis-title')
-        .transition()
-        .duration(1000)
-        .style("opacity", 0)
-        .on('end', function () {
-          beeswarm_svg.select(".x-axis-line")
-            .transition()
-            .duration(1000)
-            .call(d3.axisBottom(xScale))
-            .on('end', function () {
-              beeswarm_svg.select('.x-axis-title')
-                .transition()
-                .duration(1000)
-                .text(x_axis_display)
-                .style("opacity", 1)
-                .on('end', function () {
-                  let b_data = beeswarm(data)
-                  g.selectAll('circle')
-                    .data(b_data, d => d.data.country)
-                    .join('circle')
-                    .transition()
-                    .duration(1000)
-                    .attr("cx", d => d.x)
-                    .attr("cy", d => d.y)
-                    .attr("r", d => d.r)
-                    .delay(function (d, i) { return (i * 5) })
-                });
-  
-            });
-        });
-  
-      updateData();
-      addToolTip()
-  
-  
-    }
-
   
     const planetTooltip = d3.select("body").append("div")
     .attr("id", "planetTooltip")
@@ -719,7 +753,7 @@ function updateChart(change) {
         const xPosition = event.pageX + 10;
         const yPosition = event.pageY - 30;
         // console.log(d)
-        planetTooltip.html(`<strong>${d.data.name}</strong><br>Distance: ${d.data.distance} ly <br>Planet Type: ${d.data.planet_type}`)
+        planetTooltip.html(`<strong>${d.data.name}</strong><br>Distance: ${d.data.distance} ly <br>Planet Type: ${d.data.planet_type}<br>Planet Radius: ${d.data.radius}<br>Detection Method: ${d.data.detection_method}`)
         planetTooltip.style('left', xPosition + 'px')
             .style('top', yPosition + 'px');
         planetTooltip.style('display', 'inline-block')
@@ -744,8 +778,8 @@ function updateChart(change) {
         })
     .on('click', function(event, d){
 
-        updateCirclesEarth(d.data.mass_multiplier, d.data.mass_wrt, d.data.name, colorScale(d.data.planet_type));
-        updateCirclesJupiter(d.data.mass_multiplier, d.data.mass_wrt, d.data.name, colorScale(d.data.planet_type));
+        updateCirclesEarth(d.data.mass_multiplier, d.data.mass_wrt, d.data.name, `url(#planetGradient_${d.data.planet_type.replace(/ /g, "_")})`);
+        updateCirclesJupiter(d.data.mass_multiplier, d.data.mass_wrt, d.data.name, `url(#planetGradient_${d.data.planet_type.replace(/ /g, "_")})`);
         // balanceSeesawEarth();
     })
 }
